@@ -27,7 +27,7 @@ public class ContactRestController {
 	public ResponseEntity<?> contact(@RequestBody Contact contact){
 		try {
 			String status = service.upsert(contact);
-			return new ResponseEntity<>	(status, HttpStatus.CREATED);
+			return new ResponseEntity<String>(status, HttpStatus.CREATED);
 		} 
 		catch (BusinessException e) {			
 			ControllerException ce = new ControllerException(e.getErrorCode(), e.getErrorMessage());
@@ -41,11 +41,10 @@ public class ContactRestController {
 	
 	@GetMapping("/contacts")
 	public ResponseEntity<?> getAllContacts(){
-		try {
-			
-			List<Contact> allContacts = service.getAllContacts();		
-			return new ResponseEntity<List<Contact>>(allContacts,HttpStatus.OK);	
-			
+		
+		List<Contact> allContacts = null;
+		try {			
+			allContacts = service.getAllContacts();			
 		} 
 		catch (BusinessException e) {
 			ControllerException ce = new ControllerException(e.getErrorCode(), e.getErrorMessage());
@@ -55,6 +54,7 @@ public class ContactRestController {
 			ControllerException ce = new ControllerException("709", "Something wrong in Controller");
 			return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_GATEWAY);
 		}
+		return new ResponseEntity<List<Contact>>(allContacts,HttpStatus.OK);
 	}
 	
 	@GetMapping("/contact/{cid}")

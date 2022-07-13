@@ -34,16 +34,21 @@ public class ContactServiceImpl implements ContactService {
 	}
 
 	@Override
-	public List<Contact> getAllContacts() {				
+	public List<Contact> getAllContacts() {
+
+		List<Contact> contacts = null;
+
 		try {
-			List<Contact> contacts = repository.findAll();
-			if(contacts.isEmpty()) 
-				throw new BusinessException("704", "Contact List is Empty");		
-			return contacts;
-			
-		} catch (Exception e) {
-			throw new BusinessException("705", "Something went wrong in service layer while fetching all contacts" +e.getMessage());
+			contacts = repository.findAll();
+		} 
+		catch (Exception e) {
+			throw new BusinessException("705","Something went wrong in service layer while fetching all contacts" + e.getMessage());
 		}
+
+		if (contacts.isEmpty())
+			throw new BusinessException("704", "Contact List is completely empty now");
+
+		return contacts;
 	}
 
 	@Override
