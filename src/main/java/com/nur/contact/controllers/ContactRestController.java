@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nur.contact.custom.exception.BusinessException;
-import com.nur.contact.custom.exception.ControllerException;
 import com.nur.contact.entities.Contact;
 import com.nur.contact.services.ContactService;
 
@@ -24,71 +22,32 @@ public class ContactRestController {
 	private ContactService service;
 	
 	@PostMapping("/contact")
-	public ResponseEntity<?> contact(@RequestBody Contact contact){
-		try {
-			String status = service.upsert(contact);
-			return new ResponseEntity<String>(status, HttpStatus.CREATED);
-		} 
-		catch (BusinessException e) {			
-			ControllerException ce = new ControllerException(e.getErrorCode(), e.getErrorMessage());
-			return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-		}
-		catch (Exception e) {			
-			ControllerException ce = new ControllerException("709", "Something wrong in Controller");
-			return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_GATEWAY);
-		}
+	public ResponseEntity<String> contact(@RequestBody Contact contact){
+		String status = service.upsert(contact);
+		return new ResponseEntity<>	(status, HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/contacts")
-	public ResponseEntity<?> getAllContacts(){
-		
-		List<Contact> allContacts = null;
-		try {			
-			allContacts = service.getAllContacts();			
-		} 
-		catch (BusinessException e) {
-			ControllerException ce = new ControllerException(e.getErrorCode(), e.getErrorMessage());
-			return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-		}
-		catch (Exception e) {			
-			ControllerException ce = new ControllerException("709", "Something wrong in Controller");
-			return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_GATEWAY);
-		}
-		return new ResponseEntity<List<Contact>>(allContacts,HttpStatus.OK);
+	public ResponseEntity<List<Contact>> getAllContacts(){
+		List<Contact> allContacts = service.getAllContacts();		
+		return new ResponseEntity<>(allContacts,HttpStatus.OK);		
 	}
 	
 	@GetMapping("/contact/{cid}")
-	public ResponseEntity<?> getContact(@PathVariable int cid){
+	public ResponseEntity<Contact> getContact(@PathVariable int cid){
+		Contact contact = service.getContact(cid);
 		
-		try {			
-			Contact contact = service.getContact(cid);			
-			return new ResponseEntity<Contact>(contact,HttpStatus.OK);				
-		} 
-		catch (BusinessException e) {
-			ControllerException ce = new ControllerException(e.getErrorCode(), e.getErrorMessage());
-			return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_REQUEST);
-		}
-		catch (Exception e) {			
-			ControllerException ce = new ControllerException("710", "Something wrong in Controller while fetching by id");
-			return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_GATEWAY);
-		}
+		if(contact==null) {
+			return new ResponseEntity<>(contact,HttpStatus.NOT_FOUND);
+		}	
+		return new ResponseEntity<>(contact,HttpStatus.OK);	
 	}
 	
 	
 	@DeleteMapping("/contact/{cid}")
-	public ResponseEntity<?> deleteContact(@PathVariable int cid){
-		try {
-			
-			String deleteContact = service.deleteContact(cid);
-			return new ResponseEntity<>(deleteContact,HttpStatus.OK);
-			
-		} catch (BusinessException e) {
-			ControllerException ce = new ControllerException(e.getErrorCode(),e.getErrorMessage());
-			return new ResponseEntity<ControllerException>(ce,HttpStatus.BAD_REQUEST);
-		}catch (Exception e) {
-			ControllerException ce = new ControllerException("709", "Something wrong in Controller");
-			return new ResponseEntity<ControllerException>(ce, HttpStatus.BAD_GATEWAY);
-		}
+	public ResponseEntity<String> deleteContact(@PathVariable int cid){
+		String deleteContact = service.deleteContact(cid);
+		return new ResponseEntity<>(deleteContact,HttpStatus.OK);	
 	}
 	
 	@DeleteMapping("/softdel/{cid}")

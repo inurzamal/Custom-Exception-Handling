@@ -6,7 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.nur.contact.custom.exception.BusinessException;
+import com.nur.contact.custom.exception.EmptyInputException;
+import com.nur.contact.custom.exception.NotFoundException;
 import com.nur.contact.entities.Contact;
 import com.nur.contact.repos.ContactRepository;
 
@@ -21,61 +22,42 @@ public class ContactServiceImpl implements ContactService {
 	public String upsert(Contact contact) {
 		
 		if(contact.getName().isBlank() || contact.getName().length()==0) {
-			throw new BusinessException("701", "Name is Blank");
+			throw new EmptyInputException();
 		}	
-		try {			
-			repository.save(contact);
-			return "Success";			
-		} catch (IllegalArgumentException e) {
-			throw new BusinessException("702", "given contact is empty" +e.getMessage());
-		}catch (Exception e) {
-			throw new BusinessException("703", "Something went wrong in service layer while saving data" +e.getMessage());
-		}
+		repository.save(contact);
+		return "Success";	
 	}
+
 
 	@Override
 	public List<Contact> getAllContacts() {
 
-		List<Contact> contacts = null;
-
-		try {
-			contacts = repository.findAll();
-		} 
-		catch (Exception e) {
-			throw new BusinessException("705","Something went wrong in service layer while fetching all contacts" + e.getMessage());
-		}
-
-		if (contacts.isEmpty())
-			throw new BusinessException("704", "Contact List is completely empty now");
-
-		return contacts;
+		return repository.findAll();
 	}
 
 	@Override
-	public Contact getContact(int cid) {
-		try {
-			Optional<Contact> findById = repository.findById(cid);
-			if(findById.isPresent()) {
-				return findById.get();
-			}
-			throw new BusinessException("707", "contact does not exit with this id");
-		} 
-		catch (IllegalArgumentException e) {
-			throw new BusinessException("701", "given id is null "+e.getMessage());
-		} 
+	public Contact getContact(int cid) {		
+		return repository.findById(cid).get();
 	}
-
+	
+//	@Override
+//	public Contact getContact(int cid) {	
+//		Optional<Contact> findById = repository.findById(cid);		
+//		if (findById.isPresent()) {
+//			return findById.get();
+//		}
+//		return null;
+//	}
+	
 	@Override
-	public String deleteContact(int cid) {			
-		try {			
-			Optional<Contact> id = repository.findById(cid);
-			if(id.isPresent())
-				repository.deleteById(cid);
-			throw new BusinessException("707", "Id does noe exist");
-			
-		} catch (IllegalArgumentException e) {
-			throw new BusinessException("701", "Id is null, Please send Id" + e.getMessage());
-		}
+	public String deleteContact(int cid) {
+		
+		Optional<Contact> optional = repository.findById(cid);
+		if(optional.isPresent()) {
+			repository.deleteById(cid);
+			return "Deleted successfully";
+		}		
+		throw new NotFoundException();
 	}
 	
 	@Override
@@ -85,7 +67,8 @@ public class ContactServiceImpl implements ContactService {
 			Contact contact = findById.get();
 			contact.setActiveSw("N");
 			repository.save(contact);
+			return "Contact deleted soft";
 		}
-		return "Contact deleted soft";
+		throw new NotFoundException();
 	}
 }

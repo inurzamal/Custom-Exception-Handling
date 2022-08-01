@@ -3,7 +3,7 @@ package com.nur.contact.custom.exception;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BusinessException extends RuntimeException{
+public class NotFoundException extends RuntimeException{
 	
 	/**
 	 * 
@@ -13,9 +13,9 @@ public class BusinessException extends RuntimeException{
 	private String errorCode;
 	private String errorMessage;	
 	
-	public BusinessException() {}
+	public NotFoundException() {}
 		
-	public BusinessException(String errorCode, String errorMessage) {
+	public NotFoundException(String errorCode, String errorMessage) {
 		super();
 		this.errorCode = errorCode;
 		this.errorMessage = errorMessage;

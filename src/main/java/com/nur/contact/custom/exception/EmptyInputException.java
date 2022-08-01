@@ -3,7 +3,7 @@ package com.nur.contact.custom.exception;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ControllerException extends RuntimeException{
+public class EmptyInputException extends RuntimeException{
 	
 	/**
 	 * 
@@ -13,9 +13,9 @@ public class ControllerException extends RuntimeException{
 	private String errorCode;
 	private String errorMessage;	
 	
-	public ControllerException() {}
+	public EmptyInputException() {}
 		
-	public ControllerException(String errorCode, String errorMessage) {
+	public EmptyInputException(String errorCode, String errorMessage) {
 		super();
 		this.errorCode = errorCode;
 		this.errorMessage = errorMessage;
